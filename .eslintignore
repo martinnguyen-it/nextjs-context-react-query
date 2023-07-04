@@ -1,0 +1,7 @@
+.commitlintrc.js
+.eslintrc.js
+.huskyrc.js
+babel.config.js
+src/serviceWorker.js
+node_modules/
+.next/
