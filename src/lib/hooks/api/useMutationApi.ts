@@ -1,14 +1,13 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useState } from 'react';
 import { MutationFunction, useMutation } from 'react-query';
-import { TRestAPIEndPoints } from './endpoints';
+import { TMutationAPIEndPoints } from './endpoints';
 import { IErrorResponseBody } from '@lib/types/api/api.response';
 import { API } from '@/src/shared/constants';
 
 export function useMutationApi<TResponse = any, TRequestRequiredParams = any, TTransformedResponse = TResponse>(
-    sendRequestFunction: (requestRequiredParams: TRequestRequiredParams) => TRestAPIEndPoints,
+    sendRequestFunction: (requestRequiredParams: TRequestRequiredParams) => TMutationAPIEndPoints,
 ) {
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [responseBody, setResponseBody] = useState<TTransformedResponse>();
 
     const mutationFunction: MutationFunction<AxiosResponse<TResponse>, TRequestRequiredParams> = React.useCallback(
@@ -30,22 +29,15 @@ export function useMutationApi<TResponse = any, TRequestRequiredParams = any, TT
         [],
     );
 
-    const { mutate, isError, error, isSuccess } = useMutation<
+    const { mutate, isError, error, isSuccess, isLoading } = useMutation<
         AxiosResponse<TResponse>,
         AxiosError<IErrorResponseBody, any>,
         TRequestRequiredParams
     >(mutationFunction, {
-        onMutate: () => {
-            setIsLoading(true);
-        },
         onSuccess: (response) => {
-            setIsLoading(false);
             if (response.data) {
                 setResponseBody(response.data as any as TTransformedResponse);
             }
-        },
-        onError: (error) => {
-            setIsLoading(false);
         },
     });
 

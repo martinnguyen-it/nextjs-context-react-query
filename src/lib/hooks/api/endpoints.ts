@@ -6,8 +6,8 @@ interface IGenericEndpoint {
 }
 
 interface IProductEndpoint extends IGenericEndpoint {
-    method?: 'POST' | 'GET' | 'DELETE' | 'PUT';
+    method: 'POST' | 'GET' | 'DELETE' | 'PUT';
     endpoint: string;
 }
 
-export type TRestAPIEndPoints = IProductEndpoint;
+export type TMutationAPIEndPoints = IProductEndpoint;

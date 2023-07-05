@@ -13,6 +13,8 @@ import { useCreateProduct } from '@/src/lib/hooks/api/product/useCreateProduct';
 import { queryFunction } from '@/src/lib/hooks/api/queryFunction';
 import { useProductContext } from '@/src/lib/hooks/context';
 import { useQuery } from 'react-query';
+import Spinner from '@/src/components/Spinner';
+import { useUpdateProduct } from '@/src/lib/hooks/api/product/useUpdateProduct';
 
 interface IForm {
     price: number;
@@ -25,6 +27,7 @@ export default function Counter() {
     const defaultValue = { price: 0, name: '' };
 
     const createProduct = useCreateProduct();
+    const updateProduct = useUpdateProduct();
     const deleteProduct = useDeleteProduct();
     const {
         register,
@@ -59,7 +62,7 @@ export default function Counter() {
                             payload: data.data as TProductType,
                         });
                     },
-                    onError: (error) => {
+                    onError: () => {
                         toast.error(createProduct.errorMessage);
                     },
                 },
@@ -71,7 +74,7 @@ export default function Counter() {
         [],
     );
 
-    const handleDelete = async (e: any) => {
+    const handleDelete = (e: any) => {
         if (confirm('Are you sure you want to delete ?')) {
             deleteProduct.sendRequest(
                 { payload: { id: e.currentTarget.id } },
@@ -83,7 +86,7 @@ export default function Counter() {
                         });
                         toast.error('Deleted Success');
                     },
-                    onError: (error) => {
+                    onError: () => {
                         toast.error(deleteProduct.errorMessage);
                     },
                 },
@@ -99,13 +102,25 @@ export default function Counter() {
         reset({ name: valueUpdate?.name || '', price: valueUpdate?.price || 0 });
     };
     const handleUpdate = handleSubmit((data) => {
-        dispatch({
-            type: PRODUCT_ACTIONS.Update,
-            payload: { id: update.id, price: data.price * 1, name: data.name },
-        });
-        toast.success('Update Success');
-        reset(defaultValue);
-        setUpdate({ isUpdate: false, id: '' });
+        updateProduct.sendRequest(
+            {
+                payload: { id: update.id, price: data.price * 1, name: data.name },
+            },
+            {
+                onSuccess: async (data: any) => {
+                    await dispatch({
+                        type: PRODUCT_ACTIONS.Update,
+                        payload: data.data as TProductType,
+                    });
+                    toast.success('Update Success');
+                    reset(defaultValue);
+                    setUpdate({ isUpdate: false, id: '' });
+                },
+                onError: () => {
+                    toast.error(deleteProduct.errorMessage);
+                },
+            },
+        );
     });
 
     const handlSkipUpdate = useCallback(() => {
@@ -120,7 +135,7 @@ export default function Counter() {
 
             <Menu />
             <main className='flex flex-col justify-center text-center align-middle  mx-auto mt-10 bg-white'>
-                <div className='font-bold text-2xl mt-10 max-w-[700px] mx-auto flex'>
+                <div className='font-bold text-2xl mt-10 max-w-[800px] mx-auto flex'>
                     <div>
                         <input
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-[400px]'
@@ -144,13 +159,15 @@ export default function Counter() {
                             {' '}
                             <button
                                 onClick={handleUpdate}
-                                className='bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg ml-4'
+                                disabled={updateProduct.isLoading}
+                                className='bg-yellow-500 hover:bg-yellow-700 min-w-fit flex items-center text-white font-bold py-2 px-4 rounded-lg ml-4'
                             >
+                                {updateProduct.isLoading ? <Spinner /> : ''}
                                 Update
                             </button>
                             <button
                                 onClick={handlSkipUpdate}
-                                className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg ml-4'
+                                className='bg-green-500 min-w-fit flex items-center hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg ml-4'
                             >
                                 Skip
                             </button>
@@ -158,8 +175,10 @@ export default function Counter() {
                     ) : (
                         <button
                             onClick={handleAdd}
-                            className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg ml-4'
+                            disabled={createProduct.isLoading}
+                            className='bg-blue-500 hover:bg-blue-700 min-w-fit flex items-center text-white font-bold py-2 px-4 rounded-lg ml-4'
                         >
+                            {createProduct.isLoading ? <Spinner /> : ''}
                             Add
                         </button>
                     )}
