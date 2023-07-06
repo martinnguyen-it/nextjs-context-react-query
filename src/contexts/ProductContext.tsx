@@ -1,8 +1,8 @@
 import React, { createContext, useReducer, Dispatch } from 'react';
 import { productReducers } from './reducers/productReducers';
-import { TInitialProductStateType, TProductActions } from '../lib/types/productTypes';
+import { TInitialProductStateType, TProductActions, TProductType } from '../lib/types/productTypes';
 
-const initialState = {
+const initialState: { products: TProductType[] } = {
     products: [],
 };
 

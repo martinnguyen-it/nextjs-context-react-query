@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocalStorage } from '../lib/hooks/localStorage';
 
 export interface ICounterContext {
     counter: number;
@@ -13,7 +14,7 @@ const DEFAULT_COUNTER: ICounterContext = {
 const CounterContext = React.createContext<ICounterContext>(DEFAULT_COUNTER);
 
 export const CounterContextProvider: React.FC<{ children: any }> = ({ children }) => {
-    const [counter, setCounter] = useState<number>(0);
+    const [counter, setCounter] = useLocalStorage({ key: 'counter', defaultValue: 0 });
 
     const values: ICounterContext = React.useMemo(
         () => ({

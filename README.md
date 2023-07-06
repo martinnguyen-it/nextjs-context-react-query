@@ -1,5 +1,6 @@
 ## TS + NextJS + Context API + react-query
-Demo: https://codesandbox.io/p/github/martinnguyen-it/nextjs-context-react-query/main
+
+Demo: https://nextjs-context-react-query.vercel.app/
 
 ## Getting Started
 
